@@ -1,47 +1,55 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"math/rand"
-	"os"
-	"time"
+	"log"
+	"strconv"
+
+	"github.com/eiannone/keyboard"
 )
 
-const prompt = "and don't type your number in, just press ENTER when ready."
-
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	err := keyboard.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	firstNumber := rand.Intn(8) + 2
-	secondNumber := rand.Intn(8) + 2
-	subtraction := rand.Intn(8) + 2
-	answer := firstNumber*secondNumber - subtraction
+	defer func() {
+		_ = keyboard.Close()
+	}()
 
-	playTheGame(firstNumber, secondNumber, subtraction, answer)
-}
+	coffees := make(map[int]string)
+	coffees[1] = "Cappuccino"
+	coffees[2] = "Latte"
+	coffees[3] = "Americano"
+	coffees[4] = "Mocha"
+	coffees[5] = "Macchiato"
+	coffees[6] = "Espresso"
 
-func playTheGame(firstNumber, secondNumber, subtraction, answer int) {
-	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("MENU")
+	fmt.Println("----")
+	fmt.Println("1 - Cappuccino")
+	fmt.Println("2 - Latte")
+	fmt.Println("3 - Americano")
+	fmt.Println("4 - Mocha")
+	fmt.Println("5 - Macchiato")
+	fmt.Println("6 - Espresso")
+	fmt.Println("Q - Quit the program")
+	fmt.Println("--------------------")
 
-	fmt.Println("Guess the Number Game")
-	fmt.Println("---------------------")
-	fmt.Println("")
+	for {
+		char, _, err := keyboard.GetSingleKey()
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	fmt.Println("Think of a number between 1 and 10", prompt)
-	reader.ReadString('\n')
+		if char == 'q' || char == 'Q' {
+			break
+		}
 
-	fmt.Println("Multiply your number by", firstNumber, prompt)
-	reader.ReadString('\n')
+		i, _ := strconv.Atoi(string(char))
+		fmt.Println(fmt.Sprintf("You chose %s", coffees[i]))
+	}
 
-	fmt.Println("Now multiply the result by", secondNumber, prompt)
-	reader.ReadString('\n')
-
-	fmt.Println("Divide the result by the number you originally thought of", prompt)
-	reader.ReadString('\n')
-
-	fmt.Println("Now subtract", subtraction, prompt)
-	reader.ReadString('\n')
-
-	fmt.Println("The answer is", answer)
+	fmt.Println("Program exiting.")
 }
