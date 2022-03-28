@@ -168,11 +168,9 @@ Player: %d/3, Computer %d/3
 	if game.Round.PlayerScore > game.Round.ComputerScore {
 		game.DisplayChan <- "Player wins game!"
 		<-game.DisplayChan
-		// fmt.Println("Player wins game!")
 	} else {
 		game.DisplayChan <- "Computer wins game!"
 		<-game.DisplayChan
-		// fmt.Println("Computer wins game!")
 	}
 
 	game.DisplayChan <- ""
