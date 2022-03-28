@@ -1,86 +1,40 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"strconv"
-
-	"github.com/eiannone/keyboard"
+	"rockPaperScissors/game"
 )
 
 func main() {
-	err := keyboard.Open()
-	if err != nil {
-		log.Fatal(err)
+	displayChan := make(chan string)
+	roundChan := make(chan int)
+
+	game := game.Game{
+		DisplayChan: displayChan,
+		RoundChan:   roundChan,
+		Round: game.Round{
+			RoundNumber:   0,
+			PlayerScore:   0,
+			ComputerScore: 0,
+		},
 	}
 
-	defer func() {
-		_ = keyboard.Close()
-	}()
+	go game.Rounds()
+	game.ClearScreen()
+	game.PrintIntro()
 
-	coffees := make(map[int]string)
-	coffees[1] = "Cappuccino"
-	coffees[2] = "Latte"
-	coffees[3] = "Americano"
-	coffees[4] = "Mocha"
-	coffees[5] = "Macchiato"
-	coffees[6] = "Espresso"
+	for {
+		game.RoundChan <- 1
+		<-game.RoundChan
 
-	fmt.Println("MENU")
-	fmt.Println("----")
-	fmt.Println("1 - Cappuccino")
-	fmt.Println("2 - Latte")
-	fmt.Println("3 - Americano")
-	fmt.Println("4 - Mocha")
-	fmt.Println("5 - Macchiato")
-	fmt.Println("6 - Espresso")
-	fmt.Println("Q - Quit the program")
-	fmt.Println("--------------------")
-
-	char := ' '
-
-	for char != 'q' && char != 'Q' {
-		char, _, err = keyboard.GetSingleKey()
-		if err != nil {
-			log.Fatal(err)
+		if game.Round.RoundNumber > 3 {
+			break
 		}
 
-		i, _ := strconv.Atoi(string(char))
-
-		if _, ok := coffees[i]; ok {
-			fmt.Println(fmt.Sprintf("You chose %s", coffees[i]))
+		if !game.PlayRound() {
+			game.RoundChan <- -1
+			<-game.RoundChan
 		}
 	}
 
-	// for {
-	// 	char, _, err = keyboard.GetSingleKey()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// 	if char == 'q' || char == 'Q' {
-	// 		break
-	// 	}
-
-	// 	i, _ := strconv.Atoi(string(char))
-
-	// 	if _, ok := coffees[i]; ok {
-	// 		fmt.Println(fmt.Sprintf("You chose %s", coffees[i]))
-	// 	}
-	// }
-
-	// for ok := true; ok; ok = char != 'q' && char != 'Q' {
-	// 	char, _, err = keyboard.GetSingleKey()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// 	i, _ := strconv.Atoi(string(char))
-
-	// 	if _, ok := coffees[i]; ok {
-	// 		fmt.Println(fmt.Sprintf("You chose %s", coffees[i]))
-	// 	}
-	// }
-
-	fmt.Println("Program exiting.")
+	game.PrintSummary()
 }
