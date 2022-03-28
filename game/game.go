@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	ROCK     = 0
-	PAPER    = 1
-	SCISSORS = 2
+	ROCK     = 0 // beats scissors (scissors + 1) % 3 = 0
+	PAPER    = 1 // beats rock (rock + 1) % 3 = 1
+	SCISSORS = 2 // beats paper (paper + 1) % 3 = 2
 )
 
 type Game struct {
@@ -128,34 +128,14 @@ Round %d
 		game.DisplayChan <- "It's a draw!"
 		<-game.DisplayChan
 		return false
+	} else if playerValue == -1 {
+		game.DisplayChan <- "Invalid choice!"
+		<-game.DisplayChan
+		return false
+	} else if playerValue == (computerValue+1)%3 {
+		game.playerWins()
 	} else {
-		switch playerValue {
-		case ROCK:
-			if computerValue == PAPER {
-				game.computerWins()
-			} else {
-				game.playerWins()
-			}
-			break
-		case PAPER:
-			if computerValue == SCISSORS {
-				game.computerWins()
-			} else {
-				game.playerWins()
-			}
-			break
-		case SCISSORS:
-			if computerValue == ROCK {
-				game.computerWins()
-			} else {
-				game.playerWins()
-			}
-			break
-		default:
-			game.DisplayChan <- "Invalid choice!"
-			<-game.DisplayChan
-			return false
-		}
+		game.computerWins()
 	}
 
 	return true
