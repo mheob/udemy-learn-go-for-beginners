@@ -1,40 +1,19 @@
 package main
 
 import (
-	"rockPaperScissors/game"
+	"fmt"
+	"log"
+	"net/http"
 )
 
+func homePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Welcome to the HomePage!")
+	fmt.Println("Endpoint Hit: homePage")
+}
+
 func main() {
-	displayChan := make(chan string)
-	roundChan := make(chan int)
+	http.HandleFunc("/", homePage)
 
-	game := game.Game{
-		DisplayChan: displayChan,
-		RoundChan:   roundChan,
-		Round: game.Round{
-			RoundNumber:   0,
-			PlayerScore:   0,
-			ComputerScore: 0,
-		},
-	}
-
-	go game.Rounds()
-	game.ClearScreen()
-	game.PrintIntro()
-
-	for {
-		game.RoundChan <- 1
-		<-game.RoundChan
-
-		if game.Round.RoundNumber > 3 {
-			break
-		}
-
-		if !game.PlayRound() {
-			game.RoundChan <- -1
-			<-game.RoundChan
-		}
-	}
-
-	game.PrintSummary()
+	log.Println("Web server started on: http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
