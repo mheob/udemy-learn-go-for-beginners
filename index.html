@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock, Paper, Scissors</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="mt-4">Rock, Paper, Scissors</h1>
+    <hr>
+
+    <p id="player-choice">&nbsp;</p>
+    <p id="computer-choice">&nbsp;</p>
+    <p class="text-danger" id="round-result">&nbsp;</p>
+    <p class="text-success" id="round-message">&nbsp;</p>
+
+    <hr>
+    <p>Choose rock, paper or scissors!</p>
+    <br>
+    <br>
+
+    <button class="btn btn-outline-secondary" onclick="choose(0)">Rock</button>
+    <button class="btn btn-outline-danger" onclick="choose(1)">Paper</button>
+    <button class="btn btn-outline-success" onclick="choose(2)">Scissors</button>
+  </div>
+
+  <script>
+    async function choose(x) {
+      const response = await fetch('/play?choice=' + x)
+      const data = await response.json()
+
+      if (x == 0) {
+        document.querySelector('#player-choice').innerHTML = "You chose ROCK";
+      } else if (x == 1) {
+        document.querySelector('#player-choice').innerHTML = "You chose PAPER";
+      } else {
+        document.querySelector('#player-choice').innerHTML = "You chose SCISSORS";
+      }
+
+      document.querySelector('#computer-choice').innerHTML = data['computer-choice'];
+      document.querySelector('#round-result').innerHTML = data['round-result'];
+      document.querySelector('#round-message').innerHTML = data['round-message'];
+    }
+  </script>
+</body>
+
+</html>
